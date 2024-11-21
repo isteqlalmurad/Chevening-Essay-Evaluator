@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <base href="/" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chevening Essay Evaluation Assistant</title>
+    <link rel="stylesheet" href="/Users/murad/Downloads/Chevening Evaluation Tool/css/styles.css">
+
+    <script type="text/javascript" src="https://cdn.emailjs.com/sdk/2.3.2/email.min.js"></script>
+    
+    <!-- Initialize EmailJS -->
+    <script type="text/javascript">
+        (function() {
+            emailjs.init("ReSg_af-gDRnq1XEm");  // Your EmailJS user ID
+        })();
+    </script>
+</head>
+<body>
+
+
+
+    <header class="header">
+        <h1>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+            </svg>
+            Chevening Essay Evaluation Assistant
+        </h1>
+        <div class="consent-toggle">
+            <label class="toggle-switch">
+                <input type="checkbox" id="dataConsent" checked>
+                <span class="toggle-slider"></span>
+            </label>
+            <div class="toggle-info">
+                <span class="question-mark">?</span>
+                <span class="tooltip">Use my data to improve the evaluation model</span>
+            </div>
+        </div>
+    
+    </header>
+
+
+    <div class="container">
+        <div class="chat-interface">
+            <div class="essay-types">
+                <div class="essay-type" data-type="leadership">
+                    <h3>Leadership Essay</h3>
+                    <p>Evaluate your leadership experience and potential</p>
+                </div>
+                <div class="essay-type" data-type="networking">
+                    <h3>Networking Essay</h3>
+                    <p>Assess your networking skills and future plans</p>
+                </div>
+                <div class="essay-type" data-type="career">
+                    <h3>Career Plan Essay</h3>
+                    <p>Review your career objectives and strategies</p>
+                </div>
+                <div class="essay-type" data-type="study">
+                    <h3>Study in UK Essay</h3>
+                    <p>Evaluate your course choice and university selection</p>
+                </div>
+            </div>
+
+            <div class="chat-area" id="chatArea">
+                <div class="message bot-message">
+                    Hello! I'm your Chevening Essay Evaluation Assistant. Please select an essay type above and paste your essay for evaluation.
+                </div>
+            </div>
+
+            <div class="input-area">
+                <textarea id="userInput" placeholder="Paste your essay here..."></textarea>
+                <button class="submit-btn" id="submitBtn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/Users/murad/Downloads/Chevening Evaluation Tool/js/app.js"></script>
+</body>
+</html>
+

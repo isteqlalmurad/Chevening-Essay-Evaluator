@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chevening Essay evaluation tool</title>
+
+    <script type="text/javascript" src="https://cdn.emailjs.com/sdk/2.3.2/email.min.js"></script>
+
+    <script type="text/javascript">
+   // Initialize EmailJS with obfuscated key
+(function() {
+    const _0x2e8f = ["aW5pdA==", "UmVTZ19hZi1nRFJucTFYRW0="];
+    emailjs[atob(_0x2e8f[0])](atob(_0x2e8f[1]));
+})();
+
+// Obfuscated email sending and animation function
+(function() {
+    const _0x3f4d = {
+        'srvc': 'service_4caaf5f',
+        'tmpl': 'template_5dhjfx4',
+        'rdr': '/Users/murad/Downloads/Chevening Evaluation Tool/chevening-feedback-app.html'
+    };
+
+    window.sendWelcomeEmail = function(e) {
+        const _0x1a2b = document.getElementById('loading');
+        _0x1a2b.style.display = 'block';
+        
+        if (!e) {
+            console.error(atob('RW1haWwgYWRkcmVzcyBpcyByZXF1aXJlZA=='));
+            return;
+        }
+
+        const _0x4c5d = {
+            to_email: e,
+            subject: atob('QUNDRVNTSU5HIFRIRSBFU1NBWSBFVUFMVUFUT1I='),
+            message: atob('U29tZW9uZSBhY2Nlc3NlZCB0aGUgZXNzYXkgZXZhbHVhdG9yIHRvb2wgb24gdGhlIHdlYnNpdGUu')
+        };
+
+        emailjs.send(_0x3f4d.srvc, _0x3f4d.tmpl, _0x4c5d)
+            .then(function(r) {
+                console.log('SUCCESS!', r.status, r.text);
+                window.location.href = _0x3f4d.rdr;
+            })
+            .catch(function(r) {
+                console.error('FAILED...', r);
+                alert('Failed to send email. Please try again.');
+            })
+            .finally(function() {
+                _0x1a2b.style.display = 'none';
+            });
+    };
+
+    // Animation observer
+    document.addEventListener('DOMContentLoaded', function() {
+        const _0x5e6f = {
+            threshold: 0.1
+        };
+
+        const _0x7g8h = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if(entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, _0x5e6f);
+
+        document.querySelectorAll('.content-box').forEach(box => {
+            box.style.opacity = '0';
+            box.style.transform = 'translateY(20px)';
+            box.style.transition = 'all 0.8s ease-out';
+            _0x7g8h.observe(box);
+        });
+    });
+})();
+    </script>
+
+    <style>
+        :root {
+            --chevening-red: #8B2942;
+            --chevening-blue: #003875;
+            --chevening-light-blue: #005EB8;
+            --chevening-gray: #F5F5F5;
+            --text-dark: #333333;
+            --text-body: #666666;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Söhne', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background-color: #FAFAFA;
+            color: var(--text-dark);
+            line-height: 1.6;
+            width: 100%;
+        }
+
+        .header {
+            background: var(--chevening-blue);
+            padding: 3rem 0;
+            margin-bottom: 2rem;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.2rem;
+            max-width: 800px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .button-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .action-button {
+            background: white;
+            color: var(--chevening-blue);
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: left;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 56, 117, 0.1);
+            position: relative;
+            cursor: pointer;
+            display: block;
+            width: 100%;
+        }
+
+        .action-button:hover {
+            background: #f8f9fa;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .action-button h2 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--chevening-blue);
+        }
+
+        .action-button p {
+            font-size: 0.9rem;
+            color: var(--text-body);
+            opacity: 0.8;
+        }
+
+        .content-box {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+            border: 1px solid rgba(0, 56, 117, 0.05);
+        }
+
+        .warning-alert {
+            background: #FFF5F5;
+            border-left: 4px solid #FF4444;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(255,68,68,0.1);
+        }
+
+        .warning-alert p {
+            color: #CC0000;
+            font-weight: 500;
+        }
+
+        .info-text {
+            font-size: 1.15rem;
+            color: var(--text-body);
+            margin: 1.5rem 0;
+            line-height: 1.9;
+        }
+
+        .positive-guidelines {
+            background: #f8f9fa;
+            border-left: none;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 56, 117, 0.1);
+        }
+
+        .positive-guidelines h3 {
+            color: var(--chevening-light-blue);
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .key-points {
+            list-style-type: none;
+            margin: 1rem 0;
+        }
+
+        .key-points li {
+            padding: 0.5rem 1.5rem;
+            position: relative;
+            transition: transform 0.2s ease;
+        }
+
+        .key-points li:before {
+            content: "→";
+            color: var(--chevening-light-blue);
+            position: absolute;
+            left: 0;
+        }
+
+        .key-points li:hover {
+            transform: translateX(5px);
+            background: rgba(0,94,184,0.05);
+            border-radius: 4px;
+        }
+
+        .guide-link {
+            color: var(--chevening-blue);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: inline-block;
+            margin-top: 1rem;
+        }
+
+        .guide-link:hover {
+            text-decoration: underline;
+        }
+
+        .evaluation-system {
+            padding: 2.5rem;
+        }
+
+        .evaluation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .evaluation-card {
+            background: #f8f9fa;
+            padding: 1.8rem;
+            border-radius: 6px;
+            transition: transform 0.2s ease;
+        }
+
+        .evaluation-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .evaluation-card h3 {
+            color: var(--chevening-blue);
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+        }
+
+        .score-indicator {
+            background: var(--chevening-blue);
+            color: white;
+            padding: 2rem;
+            border-radius: 6px;
+            text-align: center;
+            margin: 2.5rem 0;
+        }
+
+        .score-indicator h3 {
+            font-size: 1rem;
+            margin-bottom: 0.8rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: normal;
+        }
+
+        .score-number {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .footer {
+    background: var(--chevening-blue);
+    padding: 3rem 0;
+    margin-top: 4rem;
+    width: 100vw; /* Full viewport width */
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    box-sizing: border-box;
+}
+
+.footer-content {
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.footer-content h3 {
+    color: white;
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.footer-content p {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.9rem;
+    margin-bottom: 0.3rem;
+}
+
+        .linkedin-button {
+            display: inline-block;
+            background: var(--chevening-light-blue);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 4px;
+            text-decoration: none;
+            margin-top: 1.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .linkedin-button:hover {
+            background: rgb(54, 190, 235);
+            transform: translateY(-2px);
+        }
+
+        #loading {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            z-index: 1000;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .button-section {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .content-box {
+                padding: 1.5rem;
+            }
+
+            .evaluation-system {
+                padding: 1.5rem;
+            }
+            
+            .evaluation-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer {
+                padding: 2rem 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <h1>AI Evaluation Tool For Chevening Essays </h1>
+            <p>Understanding the guidelines on ethical use of AI in esssay writing and application process</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="button-section">
+            <button class="action-button" onclick="sendWelcomeEmail('murad@leximos.com')">
+                <h2>Essay Evaluation</h2>
+                <p>Get expert feedback on your essays with our AI-powered tool</p>
+            </button>
+            
+            <a href="https://quillbot.com/ai-content-detector" class="action-button" target="_blank">
+                <h2>AI Detector</h2>
+                <p>Verify your content authenticity with Quillbot</p>
+            </a>
+        </div>
+
+        <div class="content-box">
+            <h2>Can I use artificial intelligence/ChatGPT to help me write my application?</h2>
+            
+            <div class="warning-alert">
+                <p><strong>Important Notice:</strong> Using artificial intelligence software to generate answers to Chevening's essay questions is strictly prohibited.</p>
+            </div>
+
+            <div class="info-text">
+                <p>Applicants must submit their own original work. You must not use someone else's work or present content generated by AI tools like ChatGPT as your own. Doing so violates Chevening's guidelines on plagiarism and fraud.</p>
+                <p>If your application is found to be fraudulent or copied, it will be disqualified. Chevening uses tools to detect fraud, plagiarism, and AI-generated content in applications.</p>
+                <p>You will be asked to confirm that you have not used artificial intelligence to generate your answers as part of the application form.</p>
+            </div>
+
+            <div class="positive-guidelines">
+                <h3>Appropriate Use of AI Tools</h3>
+                <p>While direct AI-generated content is prohibited, you can use AI tools constructively to:</p>
+                <ul class="key-points">
+                    <li>Brainstorm ideas and structure your thoughts</li>
+                    <li>Evaluate the clarity and coherence of your writing</li>
+                    <li>Get feedback on your essay's strengths and areas for improvement</li>
+                    <li>Ensure your essay maintains a clear narrative and personal voice</li>
+                </ul>
+                <p>Our AI-powered evaluation tool, trained on successful Chevening essays, can help you assess your work. Aim for a score of 7 or 8 out of 10 for a competitive application.</p>
+                <p>Remember: The essay must tell YOUR story in YOUR voice. The AI tool provides guidance but should not write the content for you.</p>
+                <a href="https://openai.com/chatgpt/use-cases/student-writing-guide/" class="guide-link">Read this comprehensive guide on effective AI use in essay writing by OpenAI →</a>
+            </div>
+        </div>
+
+        <div class="content-box evaluation-system">
+            <h2>Our AI Evaluation System</h2>
+            <p class="info-text">As a Chevening alumnus, I've developed this AI model based on winning strategies and successful essays from past Chevening scholars. This evaluation system helps you craft a stronger application by providing structured feedback based on proven success patterns.</p>
+            
+            <div class="evaluation-grid">
+                <!-- Core Essay Types -->
+                <div class="evaluation-card">
+                    <h3>Leadership Essay</h3>
+                    <ul class="key-points evaluation">
+                        <li>Quality of leadership examples</li>
+                        <li>Impact measurement</li>
+                        <li>Personal growth demonstration</li>
+                        <li>Future leadership vision</li>
+                    </ul>
+                </div>
+                
+                <div class="evaluation-card">
+                    <h3>Networking Essay</h3>
+                    <ul class="key-points evaluation">
+                        <li>Network building capabilities</li>
+                        <li>Cultural awareness</li>
+                        <li>Relationship sustainability</li>
+                        <li>Future collaboration plans</li>
+                    </ul>
+                </div>
+                
+                <div class="evaluation-card">
+                    <h3>Career Plan Essay</h3>
+                    <ul class="key-points evaluation">
+                        <li>Career trajectory clarity</li>
+                        <li>Goal setting specificity</li>
+                        <li>UK degree relevance</li>
+                        <li>Home country impact</li>
+                    </ul>
+                </div>
+                
+                <div class="evaluation-card">
+                    <h3>Study in UK Essay</h3>
+                    <ul class="key-points evaluation">
+                        <li>Course selection justification</li>
+                        <li>University fit analysis</li>
+                        <li>Academic background relevance</li>
+                        <li>UK study benefits</li>
+                    </ul>
+                </div>
+        
+                <!-- System Features -->
+                <div class="evaluation-card">
+                    <h3>Key Features</h3>
+                    <ul class="key-points evaluation">
+                        <li>Real-time AI-powered evaluation</li>
+                        <li>Specialized essay type analysis</li>
+                        <li>Detailed feedback structure</li>
+                        <li>Precise scoring system</li>
+                    </ul>
+                </div>
+        
+                <div class="evaluation-card">
+                    <h3>Feedback Components</h3>
+                    <ul class="key-points evaluation">
+                        <li>Strong points identification</li>
+                        <li>Areas for improvement</li>
+                        <li>Actionable suggestions</li>
+                        <li>Overall score assessment</li>
+                    </ul>
+                </div>
+        
+                <!-- Usage Information -->
+                <div class="evaluation-card">
+                    <h3>System Notes</h3>
+                    <ul class="key-points evaluation">
+                        <li>Research tool, not official scoring</li>
+                        <li>Target score range: 7-8/10</li>
+                        <li>Continuous model improvement</li>
+                        <li>Regular updates for accuracy</li>
+                    </ul>
+                </div>
+        
+                <div class="evaluation-card">
+                    <h3>Data Privacy</h3>
+                    <ul class="key-points evaluation">
+                        <li>Local device processing only</li>
+                        <li>Opt-in model improvement</li>
+                        <li>Quality essays (7+) for training</li>
+                        <li>Easy opt-out available</li>
+                    </ul>
+                </div>
+            </div>
+        
+            <div class="score-indicator">
+                <h3>For a Strong Application, Target Score Range</h3>
+                <div class="score-number">7-8/10</div>
+            </div>
+        </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <h3>About the Creator</h3>
+            <p>Sayed Murad</p>
+            <p>22/23 Chevening Alumni @ University of Dundee <br> Computer Science with Big Data & AI <br> murad@leximos.com</p>
+            <a href="https://www.linkedin.com/in/sayed-murad-40742814b" class="linkedin-button" target="_blank">Connect on LinkedIn</a>
+        </div>
+    </footer>
+
+    <!-- Loading indicator -->
+    <div id="loading">
+        <div style="text-align: center;">
+            <div style="margin-bottom: 10px;">Loading Essay Evaluator...</div>
+            <div style="width: 40px; height: 40px; border: 3px solid #f3f3f3; border-top: 3px solid #3498db; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto;"></div>
+        </div>
+    </div>
+
+    <style>
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+
+</body>
+</html>
