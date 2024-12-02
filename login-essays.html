@@ -423,6 +423,7 @@
     return false;
 }
   
+// Replace your existing handleRegister function with this one
 async function handleRegister(e) {
     e.preventDefault();
     clearMessages();
@@ -439,165 +440,113 @@ async function handleRegister(e) {
         return false;
     }
 
-    // Generate verification code but don't use it for now
-    /*
-    verificationCode = generateCode();
-    registrationData = { name, email, password };
-    */
-
     try {
         button.disabled = true;
+        const response = await fetch(`${API_BASE_URL}/register`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Origin': window.location.origin
+            },
+            body: JSON.stringify({ name, email, password })
+        });
 
-        /* Email verification section - commented out for now
-        const emailSent = await sendVerificationEmail(email, verificationCode);
+        const data = await response.json();
 
-        if (emailSent) {
-            // Show verification panel
-            document.getElementById('verificationPanel').style.display = 'flex';
-            document.getElementById('verificationCode').value = '';
+        if (data.success) {
+            document.getElementById('registerSuccess').style.display = 'block';
 
-            const countdown = document.getElementById('countdown');
-            startCountdown(60, countdown);
+            // Load Stripe script
+            const stripeScript = document.createElement('script');
+            stripeScript.src = 'https://js.stripe.com/v3/buy-button.js';
+            stripeScript.async = true;
+            document.body.appendChild(stripeScript);
 
-            const resendButton = document.getElementById('resendCode');
-            resendButton.onclick = async () => {
-                verificationCode = generateCode();
-                const resent = await sendVerificationEmail(email, verificationCode);
-                if (resent) {
-                    resendButton.disabled = true;
-                    startCountdown(500, countdown);
+            // Create payment modal
+            const paymentModal = document.createElement('div');
+            paymentModal.style.position = 'fixed';
+            paymentModal.style.top = '0';
+            paymentModal.style.left = '0';
+            paymentModal.style.width = '100%';
+            paymentModal.style.height = '100%';
+            paymentModal.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+            paymentModal.style.display = 'flex';
+            paymentModal.style.justifyContent = 'center';
+            paymentModal.style.alignItems = 'center';
+            paymentModal.style.zIndex = '2000';
+
+            const paymentContent = document.createElement('div');
+            paymentContent.style.background = 'white';
+            paymentContent.style.padding = '2rem';
+            paymentContent.style.borderRadius = '1rem';
+            paymentContent.style.maxWidth = '500px';
+            paymentContent.style.width = '90%';
+            paymentContent.style.textAlign = 'center';
+            paymentContent.style.position = 'relative';
+
+            // Add close button
+            const closeButton = document.createElement('button');
+            closeButton.innerHTML = '×';
+            closeButton.style.position = 'absolute';
+            closeButton.style.top = '10px';
+            closeButton.style.right = '10px';
+            closeButton.style.background = 'none';
+            closeButton.style.border = 'none';
+            closeButton.style.fontSize = '24px';
+            closeButton.style.cursor = 'pointer';
+            closeButton.onclick = () => paymentModal.remove();
+
+            const heading = document.createElement('h2');
+            heading.textContent = 'Complete Your Subscription';
+            heading.style.marginBottom = '1.5rem';
+            heading.style.color = '#2d3748';
+
+            const stripeButton = document.createElement('stripe-buy-button');
+            stripeButton.setAttribute('buy-button-id', 'buy_btn_1QQURlE4KMDw3iLIRXlBbywY');
+            stripeButton.setAttribute('publishable-key', 'pk_live_51QQTtrE4KMDw3iLI4lW8AzaFw6B09feV75SFiS5Pu9B9SkjdUIWiL5Pg7V5fRdC5d9hsdxYQgikfkxlv1P9r4G3e00AFNzhuyy');
+            stripeButton.setAttribute('customer-email', email);
+            stripeButton.setAttribute('customer-name', name);
+
+            // Listen for successful purchase
+            window.addEventListener('message', function(ev) {
+                if (ev.data === 'checkout.completed') {
+                    paymentModal.remove();
+                    showPanel('login');
                 }
-            };
-
-            // Add verification button handler
-            document.getElementById('verifyButton').onclick = async () => {
-                const userCode = document.getElementById('verificationCode').value;
-                if (userCode !== verificationCode) {
-                    document.getElementById('verificationError').textContent = 'Invalid code';
-                    document.getElementById('verificationError').style.display = 'block';
-                    return;
-                }
-        */
-
-        // Proceed with registration directly
-        try {
-            const response = await fetch(`${API_BASE_URL}/register`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'Origin': window.location.origin
-                },
-                body: JSON.stringify({ name, email, password })
             });
 
-            const data = await response.json();
+            paymentContent.appendChild(closeButton);
+            paymentContent.appendChild(heading);
+            paymentContent.appendChild(stripeButton);
+            paymentModal.appendChild(paymentContent);
+            document.body.appendChild(paymentModal);
 
-            if (data.success) {
-                document.getElementById('registerSuccess').style.display = 'block';
-                // document.getElementById('verificationPanel').style.display = 'none';  // Commented out with email verification
+            // Close payment modal if clicked outside
+            paymentModal.addEventListener('click', (e) => {
+                if (e.target === paymentModal) {
+                    paymentModal.remove();
+                    showPanel('login');
+                }
+            });
 
-                // Load Stripe script
-                const stripeScript = document.createElement('script');
-                stripeScript.src = 'https://js.stripe.com/v3/buy-button.js';
-                stripeScript.async = true;
-                document.body.appendChild(stripeScript);
-
-                // Create payment modal
-                const paymentModal = document.createElement('div');
-                paymentModal.style.position = 'fixed';
-                paymentModal.style.top = '0';
-                paymentModal.style.left = '0';
-                paymentModal.style.width = '100%';
-                paymentModal.style.height = '100%';
-                paymentModal.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
-                paymentModal.style.display = 'flex';
-                paymentModal.style.justifyContent = 'center';
-                paymentModal.style.alignItems = 'center';
-                paymentModal.style.zIndex = '2000';
-
-                const paymentContent = document.createElement('div');
-                paymentContent.style.background = 'white';
-                paymentContent.style.padding = '2rem';
-                paymentContent.style.borderRadius = '1rem';
-                paymentContent.style.maxWidth = '500px';
-                paymentContent.style.width = '90%';
-                paymentContent.style.textAlign = 'center';
-                paymentContent.style.position = 'relative';
-
-                // Add close button
-                const closeButton = document.createElement('button');
-                closeButton.innerHTML = '×';
-                closeButton.style.position = 'absolute';
-                closeButton.style.top = '10px';
-                closeButton.style.right = '10px';
-                closeButton.style.background = 'none';
-                closeButton.style.border = 'none';
-                closeButton.style.fontSize = '24px';
-                closeButton.style.cursor = 'pointer';
-                closeButton.onclick = () => paymentModal.remove();
-
-                const heading = document.createElement('h2');
-                heading.textContent = 'Complete Your Subscription';
-                heading.style.marginBottom = '1.5rem';
-                heading.style.color = '#2d3748';
-
-                const stripeButton = document.createElement('stripe-buy-button');
-                stripeButton.setAttribute('buy-button-id', 'buy_btn_1QQURlE4KMDw3iLIRXlBbywY');
-                stripeButton.setAttribute('publishable-key', 'pk_live_51QQTtrE4KMDw3iLI4lW8AzaFw6B09feV75SFiS5Pu9B9SkjdUIWiL5Pg7V5fRdC5d9hsdxYQgikfkxlv1P9r4G3e00AFNzhuyy');
-                stripeButton.setAttribute('customer-email', email);
-                stripeButton.setAttribute('customer-name', name);
-
-                // Listen for successful purchase
-                window.addEventListener('message', function(ev) {
-                    if (ev.data === 'checkout.completed') {
-                        paymentModal.remove();
-                        showPanel('login');
-                    }
-                });
-
-                paymentContent.appendChild(closeButton);
-                paymentContent.appendChild(heading);
-                paymentContent.appendChild(stripeButton);
-                paymentModal.appendChild(paymentContent);
-                document.body.appendChild(paymentModal);
-
-                // Close payment modal if clicked outside
-                paymentModal.addEventListener('click', (e) => {
-                    if (e.target === paymentModal) {
-                        paymentModal.remove();
-                        showPanel('login');
-                    }
-                });
-
-            } else {
-                document.getElementById('registerError').textContent = data.message || 'Registration failed';
-                document.getElementById('registerError').style.display = 'block';
-            }
-
-        } catch (error) {
-            console.error('Registration error:', error);
-            document.getElementById('registerError').textContent = 'An error occurred';
-            document.getElementById('registerError').style.display = 'block';
-        }
-
-        /* End of commented out email verification section
         } else {
-            document.getElementById('registerEmailError').textContent = 'Failed to send verification code';
+            // Display error message for existing email
+            const errorMessage = data.message || 'Registration failed';
+            document.getElementById('registerEmailError').textContent = errorMessage;
             document.getElementById('registerEmailError').style.display = 'block';
+            return; // Stop execution if registration fails
         }
-        */
 
     } catch (error) {
         console.error('Registration error:', error);
-        document.getElementById('registerError').textContent = 'An error occurred';
-        document.getElementById('registerError').style.display = 'block';
+        document.getElementById('registerEmailError').textContent = 'An error occurred';
+        document.getElementById('registerEmailError').style.display = 'block';
     } finally {
         button.disabled = false;
     }
     return false;
 }
-  
       function closeVerificationPanel() {
         document.getElementById('verificationPanel').style.display = 'none';
         document.getElementById('registerButton').disabled = false;
