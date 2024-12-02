@@ -200,7 +200,7 @@ function showModal(isLoggedIn) {
     if (!isLoggedIn) {
         modalMessage.textContent = "Register to get access to extra features and more intelligent AI model, for greater accuracy in essay evaluation";
         actionBtn.textContent = "Register/Login";
-        actionBtn.onclick = () => window.location.href = `/Users/murad/Side_Projects/Chevening Evaluation Tool/login-essays.html?return=${returnUrl}`;
+        actionBtn.onclick = () => window.location.href = `../login-essays.html`;
         stripeContainer.style.display = 'none';
     } else {
         modalMessage.textContent = "Subscribe to unlock premium features";
