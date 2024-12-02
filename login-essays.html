@@ -1,0 +1,598 @@
+<html>
+  <head>
+  <style>
+  :root {
+    --primary-color: #4a5568;
+    --text-color: #2d3748;
+    --bg-color: #f8fafc;
+    --input-bg: #ffffff;
+    --error-color: #e53e3e;
+    --success-color: #48bb78;
+    --border-color: #e2e8f0;
+    --spacing-unit: 1.5rem;
+  }
+  
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+  
+  body {
+    background: var(--bg-color);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-color);
+  }
+  
+  .container {
+    width: 100%;
+    max-width: 480px;
+    padding: 3rem;
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  }
+  
+  .tab-buttons {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 3rem;
+  }
+  
+  .tab-button {
+    flex: 1;
+    padding: 1rem;
+    font-size: 1.1rem;
+    letter-spacing: 0.5px;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid var(--border-color);
+    color: #718096;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .tab-button:hover {
+    color: var(--primary-color);
+  }
+  
+  .tab-button.active {
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--primary-color);
+  }
+  
+  .panel {
+    display: none;
+    animation: fadeIn 0.3s ease-out;
+  }
+  
+  .panel.active {
+    display: block;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .form-group {
+    margin-bottom: 2rem;
+  }
+  
+  label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+  
+  input {
+    width: 100%;
+    padding: 1rem;
+    border: 1.5px solid var(--border-color);
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    background: var(--input-bg);
+    transition: all 0.3s;
+  }
+  
+  input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(74, 85, 104, 0.1);
+  }
+  
+  button[type="submit"] {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+    border-radius: 0.5rem;
+    margin-top: 1rem;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  button[type="submit"]:hover {
+    background: #2d3748;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  button[type="submit"]:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+  
+  .error-message {
+    display: none;
+    color: var(--error-color);
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+  }
+  
+  .success-message {
+    display: none;
+    color: var(--success-color);
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+  }
+  
+  #verificationPanel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .verification-content {
+    background: white;
+    padding: 3rem;
+    border-radius: 1rem;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .verification-title {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: var(--text-color);
+  }
+  
+  .verification-subtitle {
+    color: #718096;
+    margin-bottom: 2rem;
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+  
+  #countdown {
+    font-size: 0.875rem;
+    color: #718096;
+    margin-top: 0.5rem;
+  }
+  
+  #resendCode {
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background: none;
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  
+  #resendCode:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  .close-button {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+  }
+  
+  .close-button:hover {
+    transform: scale(1.1);
+  }
+  
+  .close-button svg {
+    width: 24px;
+    height: 24px;
+    fill: #718096;
+  }
+  </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="tab-buttons">
+        <button class="tab-button active" onclick="showPanel('login')">Login</button>
+        <button class="tab-button" onclick="showPanel('register')">Register</button>
+      </div>
+  
+      <div id="loginPanel" class="panel active">
+        <form onsubmit="return handleLogin(event)">
+          <div class="form-group">
+            <label for="loginEmail">Email</label>
+            <input type="email" id="loginEmail" name="loginEmail" required>
+            <div class="error-message" id="loginEmailError"></div>
+          </div>
+          
+          <div class="form-group">
+            <label for="loginPassword">Password</label>
+            <input type="password" id="loginPassword" name="loginPassword" required>
+            <div class="error-message" id="loginPasswordError"></div>
+          </div>
+  
+          <button type="submit" id="loginButton">Log in</button>
+          <div class="success-message" id="loginSuccess">Login successful!</div>
+        </form>
+      </div>
+  
+      <div id="registerPanel" class="panel">
+        <form onsubmit="return handleRegister(event)">
+          <div class="form-group">
+            <label for="registerName">Name</label>
+            <input type="text" id="registerName" name="registerName" required>
+            <div class="error-message" id="registerNameError"></div>
+          </div>
+  
+          <div class="form-group">
+            <label for="registerEmail">Email</label>
+            <input type="email" id="registerEmail" name="registerEmail" required>
+            <div class="error-message" id="registerEmailError"></div>
+          </div>
+  
+          <div class="form-group">
+            <label for="registerPassword">Password</label>
+            <input type="password" id="registerPassword" name="registerPassword" required>
+            <div class="error-message" id="registerPasswordError"></div>
+          </div>
+  
+          <div class="form-group">
+            <label for="confirmPassword">Confirm Password</label>
+            <input type="password" id="confirmPassword" name="confirmPassword" required>
+            <div class="error-message" id="confirmPasswordError"></div>
+          </div>
+  
+          <button type="submit" id="registerButton">Create Account</button>
+          <div class="success-message" id="registerSuccess">Registration successful!</div>
+        </form>
+      </div>
+    </div>
+  
+    <div id="verificationPanel">
+      <div class="verification-content">
+        <button class="close-button" onclick="closeVerificationPanel()">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+          </svg>
+        </button>
+        <h2 class="verification-title">Verify Your Email</h2>
+        <p class="verification-subtitle">We've sent a verification code to your email address. Please enter it below to complete your registration.</p>
+        
+        <div class="form-group">
+          <input type="text" id="verificationCode" maxlength="4" placeholder="••••">
+          <div class="error-message" id="verificationError"></div>
+        </div>
+        
+        <div id="countdown"></div>
+        <button type="button" id="resendCode" disabled>Resend Code</button>
+        <button type="submit" id="verifyButton">Verify & Complete Registration</button>
+      </div>
+    </div>
+  
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script>
+      (function() {
+        emailjs.init('ReSg_af-gDRnq1XEm');
+      })();
+  
+      const API_BASE_URL = 'https://kingmurad001.pythonanywhere.com';
+      const PAYMENT_PAGE_URL = 'https://buy.stripe.com/test_8wM3ft8O4cxD1qg001'; // Replace with your actual Stripe payment page URL
+      let verificationCode = '';
+      let registrationData = null;
+      let countdownInterval;
+  
+      function showPanel(panelName) {
+        document.querySelectorAll('.panel').forEach(panel => {
+          panel.classList.remove('active');
+        });
+        document.getElementById(`${panelName}Panel`).classList.add('active');
+        clearMessages();
+      }
+  
+      function clearMessages() {
+        document.querySelectorAll('.error-message, .success-message').forEach(msg => {
+          msg.style.display = 'none';
+          msg.textContent = '';
+        });
+      }
+  
+      function generateCode() {
+        return Math.floor(1000 + Math.random() * 9000).toString();
+      }
+  
+      function startCountdown(duration, display) {
+        let timer = duration;
+        clearInterval(countdownInterval);
+  
+        countdownInterval = setInterval(function() {
+          display.textContent = `Resend in ${timer} seconds`;
+          if (--timer < 0) {
+            clearInterval(countdownInterval);
+            document.getElementById('resendCode').disabled = false;
+            display.textContent = '';
+          }
+        }, 1000);
+      }
+  
+      async function sendVerificationEmail(email, code) {
+        try {
+          const templateParams = {
+            to_email: email,
+            to_name: document.getElementById('registerName').value,
+            message: code
+          };
+  
+          const result = await emailjs.send(
+            'service_4caaf5f',
+            'template_5dhjfx4',
+            templateParams
+          );
+          console.log('Email sent:', result);
+          return true;
+        } catch (error) {
+          console.error("Email sending failed:", error);
+          return false;
+        }
+      }
+  
+      async function handleLogin(e) {
+    e.preventDefault();
+    clearMessages();
+
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+    const button = document.getElementById('loginButton');
+
+    try {
+        button.disabled = true;
+        const response = await fetch(`${API_BASE_URL}/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Origin': window.location.origin
+            },
+            body: JSON.stringify({ email, password })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            // Store both token and email
+            localStorage.setItem('authToken', data.token);
+            localStorage.setItem('userEmail', email); // Add this line
+            
+            document.getElementById('loginSuccess').style.display = 'block';
+            
+            // Redirect to profile page
+            setTimeout(() => {
+                window.location.href = 'profile-page.html';
+            }, 1000);
+        } else {
+            document.getElementById('loginEmailError').textContent = 'Invalid email or password';
+            document.getElementById('loginEmailError').style.display = 'block';
+        }
+    } catch (error) {
+        console.error('Login error:', error);
+        document.getElementById('loginEmailError').textContent = 'An error occurred';
+        document.getElementById('loginEmailError').style.display = 'block';
+    } finally {
+        button.disabled = false;
+    }
+    return false;
+}
+  
+      async function handleRegister(e) {
+        e.preventDefault();
+        clearMessages();
+  
+        const name = document.getElementById('registerName').value;
+        const email = document.getElementById('registerEmail').value;
+        const password = document.getElementById('registerPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        const button = document.getElementById('registerButton');
+  
+        if (password !== confirmPassword) {
+          document.getElementById('confirmPasswordError').textContent = 'Passwords do not match';
+          document.getElementById('confirmPasswordError').style.display = 'block';
+          return false;
+        }
+  
+        verificationCode = generateCode();
+        registrationData = { name, email, password };
+  
+        try {
+          button.disabled = true;
+          const emailSent = await sendVerificationEmail(email, verificationCode);
+  
+          if (emailSent) {
+            // Show verification panel
+            document.getElementById('verificationPanel').style.display = 'flex';
+            document.getElementById('verificationCode').value = '';
+  
+            const countdown = document.getElementById('countdown');
+            startCountdown(60, countdown);
+  
+            const resendButton = document.getElementById('resendCode');
+            resendButton.onclick = async () => {
+              verificationCode = generateCode();
+              const resent = await sendVerificationEmail(email, verificationCode);
+              if (resent) {
+                resendButton.disabled = true;
+                startCountdown(500, countdown);
+              }
+            };
+  
+            // Add verification button handler
+            document.getElementById('verifyButton').onclick = async () => {
+              const userCode = document.getElementById('verificationCode').value;
+              if (userCode !== verificationCode) {
+                document.getElementById('verificationError').textContent = 'Invalid code';
+                document.getElementById('verificationError').style.display = 'block';
+                return;
+              }
+  
+              try {
+                const response = await fetch(`${API_BASE_URL}/register`, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Origin': window.location.origin
+                  },
+                  body: JSON.stringify(registrationData)
+                });
+  
+                const data = await response.json();
+  
+                if (data.success) {
+                  document.getElementById('registerSuccess').style.display = 'block';
+                  document.getElementById('verificationPanel').style.display = 'none';
+                  
+                  // Load Stripe script
+                  const stripeScript = document.createElement('script');
+                  stripeScript.src = 'https://js.stripe.com/v3/buy-button.js';
+                  stripeScript.async = true;
+                  document.body.appendChild(stripeScript);
+  
+                  // Create payment modal
+                  const paymentModal = document.createElement('div');
+                  paymentModal.style.position = 'fixed';
+                  paymentModal.style.top = '0';
+                  paymentModal.style.left = '0';
+                  paymentModal.style.width = '100%';
+                  paymentModal.style.height = '100%';
+                  paymentModal.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+                  paymentModal.style.display = 'flex';
+                  paymentModal.style.justifyContent = 'center';
+                  paymentModal.style.alignItems = 'center';
+                  paymentModal.style.zIndex = '2000';
+  
+                  const paymentContent = document.createElement('div');
+                  paymentContent.style.background = 'white';
+                  paymentContent.style.padding = '2rem';
+                  paymentContent.style.borderRadius = '1rem';
+                  paymentContent.style.maxWidth = '500px';
+                  paymentContent.style.width = '90%';
+                  paymentContent.style.textAlign = 'center';
+  
+                  const heading = document.createElement('h2');
+                  heading.textContent = 'Complete Your Subscription';
+                  heading.style.marginBottom = '1.5rem';
+                  heading.style.color = '#2d3748';
+
+                  const stripeButton = document.createElement('stripe-buy-button');
+stripeButton.setAttribute('buy-button-id', 'buy_btn_1QQURlE4KMDw3iLIRXlBbywY');
+stripeButton.setAttribute('publishable-key', 'pk_live_51QQTtrE4KMDw3iLI4lW8AzaFw6B09feV75SFiS5Pu9B9SkjdUIWiL5Pg7V5fRdC5d9hsdxYQgikfkxlv1P9r4G3e00AFNzhuyy');
+// Add customer email as attribute
+stripeButton.setAttribute('customer-email', email); // Add this line
+stripeButton.setAttribute('customer-name', name);
+  
+                
+                  paymentContent.appendChild(heading);
+                  paymentContent.appendChild(stripeButton);
+                  paymentModal.appendChild(paymentContent);
+                  document.body.appendChild(paymentModal);
+  
+                  // Close payment modal if clicked outside
+                  paymentModal.addEventListener('click', (e) => {
+                    if (e.target === paymentModal) {
+                      paymentModal.remove();
+                      showPanel('login');
+                    }
+                  });
+                } else {
+                  document.getElementById('verificationError').textContent = data.message || 'Registration failed';
+                  document.getElementById('verificationError').style.display = 'block';
+                }
+              } catch (error) {
+                console.error('Registration error:', error);
+                document.getElementById('verificationError').textContent = 'An error occurred';
+                document.getElementById('verificationError').style.display = 'block';
+              }
+            };
+          } else {
+            document.getElementById('registerEmailError').textContent = 'Failed to send verification code';
+            document.getElementById('registerEmailError').style.display = 'block';
+          }
+        } catch (error) {
+          console.error('Verification error:', error);
+          document.getElementById('registerEmailError').textContent = 'An error occurred during verification';
+          document.getElementById('registerEmailError').style.display = 'block';
+        } finally {
+          button.disabled = false;
+        }
+        return false;
+      }
+  
+      function closeVerificationPanel() {
+        document.getElementById('verificationPanel').style.display = 'none';
+        document.getElementById('registerButton').disabled = false;
+        clearInterval(countdownInterval);
+      }
+
+      // In login-essays.html
+document.addEventListener('DOMContentLoaded', function() {
+    // In your existing login success handler
+    if (data.success) {
+        document.getElementById('loginSuccess').style.display = 'block';
+        if (data.token) localStorage.setItem('authToken', data.token);
+        
+        // Check for return URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const returnUrl = urlParams.get('return');
+        
+        setTimeout(() => {
+            if (returnUrl) {
+                window.location.href = decodeURIComponent(returnUrl);
+            } else {
+                // Your default redirect
+                window.location.href = 'index.html';
+            }
+        }, 1000);
+    }
+});
+    </script>
+  </body>
+  </html>

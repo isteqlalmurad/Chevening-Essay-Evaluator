@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Chevening Essay Evaluation Tool</title>
+    <style>
+        :root {
+            --chevening-red: #8B2942;
+            --chevening-blue: #003875;
+            --chevening-light-blue: #005EB8;
+            --chevening-gray: #F5F5F5;
+            --text-dark: #333333;
+            --text-body: #666666;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Söhne', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background-color: #FAFAFA;
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        .header {
+            background: var(--chevening-blue);
+            padding: 3rem 0;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 1rem;
+            left: 2rem;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            transition: all 0.2s ease;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .profile-sidebar {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            height: fit-content;
+        }
+
+        .profile-pic {
+            width: 120px;
+            height: 120px;
+            border-radius: 60px;
+            background: var(--chevening-gray);
+            margin: 0 auto 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .profile-info {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .profile-name {
+            font-size: 1.5rem;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-email {
+            color: var(--text-body);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .profile-main {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            color: var(--chevening-blue);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--chevening-gray);
+        }
+
+        .subscription-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+
+        .status-active {
+            background: #E8F5E9;
+            color: #2E7D32;
+        }
+
+        .status-inactive {
+            background: #FFEBEE;
+            color: #C62828;
+        }
+
+        .subscription-details {
+            margin: 2rem 0;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--chevening-gray);
+        }
+
+        .detail-label {
+            color: var(--text-body);
+        }
+
+        .detail-value {
+            font-weight: 500;
+        }
+
+        .button {
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 1rem;
+            font-weight: 500;
+            text-align: center;
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        .cancel-subscription {
+            background: var(--chevening-red);
+            color: white;
+            margin-top: 1rem;
+        }
+
+        .cancel-subscription:hover {
+            background: #6d1f32;
+        }
+
+        .logout-button {
+            background: var(--chevening-blue);
+            color: white;
+            width: 100%;
+        }
+
+        .logout-button:hover {
+            background: #002855;
+        }
+
+        @media (max-width: 768px) {
+            .profile-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .back-button {
+                top: 0.5rem;
+                left: 1rem;
+            }
+        }
+
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--chevening-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+
+    <header class="header">
+        <div class="header-content">
+            <a href="index.html" class="back-button">
+                ← Back to Home
+            </a>
+            <h1>My Profile</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="profile-grid">
+            <div class="profile-sidebar">
+                <div class="profile-pic">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                </div>
+                <div class="profile-info">
+                    <div class="profile-name">Loading...</div>
+                    <div class="profile-email">Loading...</div>
+                    <button class="button logout-button">Logout</button>
+                </div>
+            </div>
+
+            <div class="profile-main">
+                <h2 class="section-title">Subscription Details</h2>
+                <div class="subscription-status status-active">
+                    Loading subscription status...
+                </div>
+
+                <div class="subscription-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Plan</span>
+                        <span class="detail-value">Loading...</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Started</span>
+                        <span class="detail-value">Loading...</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Next billing</span>
+                        <span class="detail-value">Loading...</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Subscription ID</span>
+                        <span class="detail-value">Loading...</span>
+                    </div>
+                </div>
+
+                <button class="button cancel-subscription">
+                    Cancel Subscription
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script>
+    // Configuration
+    const API_BASE_URL = 'https://kingmurad001.pythonanywhere.com';
+    
+    // ====== Utility Functions ======
+    function formatDate(dateString) {
+        if (!dateString) return 'N/A';
+        try {
+            return new Date(dateString).toLocaleDateString('en-GB', {
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric'
+            });
+        } catch (e) {
+            console.error('Date formatting error:', e);
+            return dateString;
+        }
+    }
+    
+    function toggleLoading(show) {
+        const overlay = document.getElementById('loading-overlay');
+        if (overlay) {
+            overlay.style.display = show ? 'flex' : 'none';
+        }
+    }
+    
+    function showError(message) {
+        document.querySelector('.profile-main').innerHTML = `
+            <div style="color: var(--chevening-red); padding: 2rem; text-align: center;">
+                <h2>Error</h2>
+                <p>${message}</p>
+                <button onclick="loadProfileData()" 
+                        class="button logout-button" 
+                        style="margin-top: 1rem;">
+                    Retry
+                </button>
+            </div>
+        `;
+    }
+    
+    // ====== Authentication Functions ======
+    function checkAuth() {
+        const authToken = localStorage.getItem('authToken');
+        const userEmail = localStorage.getItem('userEmail');
+    
+        if (!authToken || !userEmail) {
+            window.location.href = 'login-essays.html';
+            return null;
+        }
+    
+        return { authToken, userEmail };
+    }
+    
+    function logout() {
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('userEmail');
+        window.location.href = 'index.html';
+    }
+    
+    // ====== UI Update Functions ======
+    function updateSubscriptionDetails(user, latestPayment) {
+        const details = {
+            'Plan': 'Premium Essay Evaluation',
+            'Started': latestPayment ? formatDate(latestPayment.timestamp) : 'N/A',
+            'Next billing': latestPayment ? 
+                formatDate(new Date(new Date(latestPayment.timestamp).getTime() + 30*24*60*60*1000)) : 
+                'N/A',
+            'Subscription ID': user.subscription_id || 'N/A'
+        };
+    
+        Object.entries(details).forEach(([label, value]) => {
+            const rows = document.querySelectorAll('.detail-row');
+            rows.forEach(row => {
+                const labelElement = row.querySelector('.detail-label');
+                if (labelElement && labelElement.textContent === label) {
+                    row.querySelector('.detail-value').textContent = value;
+                }
+            });
+        });
+    }
+    
+    function updatePaymentHistory(payments = []) {
+        const historyHTML = `
+            <h2 class="section-title" style="margin-top: 2rem;">Payment History</h2>
+            <div class="subscription-details">
+                ${payments.map(payment => `
+                    <div class="detail-row">
+                        <span class="detail-label">${formatDate(payment.timestamp)}</span>
+                        <span class="detail-value">£${payment.amount.toFixed(2)} - ${payment.status}</span>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    
+        const existingHistory = document.querySelector('.payment-history');
+        if (existingHistory) {
+            existingHistory.innerHTML = historyHTML;
+        } else {
+            const historyDiv = document.createElement('div');
+            historyDiv.className = 'payment-history';
+            historyDiv.innerHTML = historyHTML;
+            document.querySelector('.profile-main').appendChild(historyDiv);
+        }
+    }
+    
+    function updateProfileUI(user) {
+    try {
+        // Get user email from storage
+        const userEmail = localStorage.getItem('userEmail');
+
+        // Profile info
+        document.querySelector('.profile-name').textContent = user.name;
+        document.querySelector('.profile-email').textContent = userEmail;
+
+        // Subscription status
+        const statusDiv = document.querySelector('.subscription-status');
+        if (user.has_active_subscription) {
+            // Active subscription UI
+            statusDiv.className = 'subscription-status status-active';
+            statusDiv.textContent = '● Active Subscription';
+            
+            // Remove any existing Stripe button
+            const existingStripeButton = document.querySelector('stripe-buy-button');
+            if (existingStripeButton) {
+                existingStripeButton.remove();
+            }
+        } else {
+            // Inactive subscription UI
+            statusDiv.className = 'subscription-status status-inactive';
+            statusDiv.textContent = '● Inactive Subscription';
+            
+            // Remove existing Stripe button if it exists
+            const existingStripeButton = document.querySelector('stripe-buy-button');
+            if (existingStripeButton) {
+                existingStripeButton.remove();
+            }
+            
+            // Add Stripe script if it doesn't exist
+            if (!document.querySelector('script[src*="buy-button.js"]')) {
+                const stripeScript = document.createElement('script');
+                stripeScript.src = 'https://js.stripe.com/v3/buy-button.js';
+                stripeScript.async = true;
+                document.head.appendChild(stripeScript);
+            }
+            
+            // Create and add Stripe button with user's email
+            const stripeButton = document.createElement('stripe-buy-button');
+            stripeButton.setAttribute('buy-button-id', 'buy_btn_1QQWvQE4KMDw3iLIsm1jABf1');
+            stripeButton.setAttribute('publishable-key', 'pk_test_51QQTtrE4KMDw3iLIgQCe6dlfBYH3A1EoGFlLGm1hxmxJdDypGBjslvUEWznBoFen8GMbkp1IPrIy0zWiRzU2b02d00hSIJpWZg');
+            stripeButton.setAttribute('customer-email', userEmail);
+            
+            // Add some styling to the button container
+            const buttonContainer = document.createElement('div');
+            buttonContainer.style.marginTop = '1rem';
+            buttonContainer.style.marginBottom = '1rem';
+            buttonContainer.appendChild(stripeButton);
+            
+            // Insert after the subscription status
+            statusDiv.parentNode.insertBefore(buttonContainer, statusDiv.nextSibling);
+        }
+
+        // Get latest payment
+        const latestPayment = user.payments && user.payments.length > 0 
+            ? user.payments[user.payments.length - 1] 
+            : null;
+
+        // Update subscription details
+        updateSubscriptionDetails(user, latestPayment);
+        updatePaymentHistory(user.payments || []);
+
+        // Show/hide cancel button based on subscription status
+        const cancelButton = document.querySelector('.cancel-subscription');
+        if (cancelButton) {
+            cancelButton.style.display = user.has_active_subscription ? 'block' : 'none';
+        }
+
+        // Update subscription details section
+        const details = {
+            'Plan': 'Premium Essay Evaluation',
+            'Started': latestPayment ? formatDate(latestPayment.timestamp) : 'N/A',
+            'Next billing': latestPayment ? 
+                formatDate(new Date(new Date(latestPayment.timestamp).getTime() + 30*24*60*60*1000)) : 
+                'N/A',
+            'Subscription ID': user.subscription_id || 'N/A'
+        };
+
+        // Update each detail row
+        Object.entries(details).forEach(([label, value]) => {
+            const rows = document.querySelectorAll('.detail-row');
+            rows.forEach(row => {
+                const labelElement = row.querySelector('.detail-label');
+                if (labelElement && labelElement.textContent === label) {
+                    row.querySelector('.detail-value').textContent = value;
+                }
+            });
+        });
+
+    } catch (error) {
+        console.error('Error updating UI:', error);
+        showError('Error updating profile display');
+        console.error('Full error details:', {
+            message: error.message,
+            stack: error.stack
+        });
+    }
+}
+    // ====== Data Loading Functions ======
+
+async function loadProfileData() {
+    const auth = checkAuth();
+    if (!auth) return;
+
+    toggleLoading(true);
+
+    try {
+        console.log('Fetching user data for:', auth.userEmail);
+
+        const response = await fetch(`${API_BASE_URL}/get_user_data`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${auth.authToken}`
+            },
+            body: JSON.stringify({ email: auth.userEmail })
+        });
+
+        console.log('Response status:', response.status);
+
+        if (!response.ok) {
+            if (response.status === 401) {
+                localStorage.clear();
+                window.location.href = 'login-essays.html';
+                return;
+            }
+            throw new Error('Failed to fetch user data');
+        }
+
+        const data = await response.json();
+        console.log('User data received:', data);
+
+        if (!data.success) {
+            throw new Error(data.message || 'Failed to fetch user data');
+        }
+
+        // Now we're using the user data directly from the response
+        const user = data.user;
+        if (!user) {
+            throw new Error('User data not found');
+        }
+
+        updateProfileUI(user);
+
+    } catch (error) {
+        console.error('Error loading profile data:', error);
+        showError('Unable to load profile data. Please try again later.');
+    } finally {
+        toggleLoading(false);
+    }
+}
+
+    
+    // ====== Subscription Management ======
+    async function cancelSubscription() {
+    const auth = checkAuth();
+    if (!auth || !confirm('Are you sure you want to cancel your subscription?')) {
+        return;
+    }
+
+    toggleLoading(true);
+
+    try {
+        console.log('Attempting to cancel subscription for:', auth.userEmail);
+        
+        const response = await fetch(`${API_BASE_URL}/cancel_subscription`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${auth.authToken}`
+            },
+            body: JSON.stringify({
+                email: auth.userEmail
+            })
+        });
+
+        const data = await response.json();
+        console.log('Cancel subscription complete response:', data);
+
+        if (!response.ok) {
+            throw new Error(data.message || 'Failed to cancel subscription');
+        }
+
+        if (data.success) {
+            alert('Subscription cancelled successfully');
+            await loadProfileData();
+        } else {
+            throw new Error(data.message || 'Failed to cancel subscription');
+        }
+
+    } catch (error) {
+        console.error('Error cancelling subscription:', error);
+        console.error('Full error details:', {
+            message: error.message,
+            stack: error.stack
+        });
+        alert(`Failed to cancel subscription: ${error.message}`);
+    } finally {
+        toggleLoading(false);
+    }
+}
+    
+    // ====== Page Initialization ======
+    document.addEventListener('DOMContentLoaded', () => {
+        // Initial load
+        loadProfileData();
+        
+        // Add event listeners
+        document.querySelector('.logout-button').onclick = logout;
+        document.querySelector('.cancel-subscription').onclick = cancelSubscription;
+    
+        // Auto-refresh data every 5 minutes
+        setInterval(loadProfileData, 5 * 60 * 1000);
+    });
+    </script>
+</body>
+</html>
