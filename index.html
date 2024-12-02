@@ -3,77 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <div class="profile-access">
+        <a href="profile-page.html" class="profile-button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="profile-icon">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            My Profile
+        </a>
+    </div>
+
     <title>Chevening Essay evaluation tool</title>
 
     <script type="text/javascript" src="https://cdn.emailjs.com/sdk/2.3.2/email.min.js"></script>
 
     <script type="text/javascript">
    // Initialize EmailJS with obfuscated key
+   // Initialize EmailJS with obfuscated key
 (function() {
     const _0x2e8f = ["aW5pdA==", "UmVTZ19hZi1nRFJucTFYRW0="];
     emailjs[atob(_0x2e8f[0])](atob(_0x2e8f[1]));
 })();
 
-// Obfuscated email sending and animation function
+// Email sending and navigation function
 (function() {
-    const _0x3f4d = {
-        'srvc': 'service_4caaf5f',
-        'tmpl': 'template_5dhjfx4',
-        'rdr': 'chevening-feedback-app.html'
+    const config = {
+        'emailService': 'service_4caaf5f',
+        'emailTemplate': 'template_5dhjfx4',
+        'evaluationPageUrl': '/Users/murad/Side_Projects/Chevening Evaluation Tool/chevening-feedback-app.html'
     };
 
-    window.sendWelcomeEmail = function(e) {
-        const _0x1a2b = document.getElementById('loading');
-        _0x1a2b.style.display = 'block';
-        
-        if (!e) {
-            console.error(atob('RW1haWwgYWRkcmVzcyBpcyByZXF1aXJlZA=='));
+    window.sendWelcomeEmail = function(email) {
+        const loadingElement = document.getElementById('loading');
+        loadingElement.style.display = 'block';
+
+        // Function to redirect to evaluation page
+        const redirectToEvaluation = () => {
+            window.location.href = config.evaluationPageUrl;
+        };
+
+        // Function to handle loading state
+        const hideLoading = () => {
+            loadingElement.style.display = 'none';
+        };
+
+        if (!email) {
+            console.error('Email address is required');
+            hideLoading();
+            redirectToEvaluation();
             return;
         }
 
-        const _0x4c5d = {
-            to_email: e,
-            subject: atob('QUNDRVNTSU5HIFRIRSBFU1NBWSBFVUFMVUFUT1I='),
-            message: atob('U29tZW9uZSBhY2Nlc3NlZCB0aGUgZXNzYXkgZXZhbHVhdG9yIHRvb2wgb24gdGhlIHdlYnNpdGUu')
+        const emailData = {
+            to_email: email,
+            subject: 'ACCESSING THE ESSAY EVALUATOR',
+            message: 'Someone accessed the essay evaluator tool on the website.'
         };
 
-        emailjs.send(_0x3f4d.srvc, _0x3f4d.tmpl, _0x4c5d)
-            .then(function(r) {
-                console.log('SUCCESS!', r.status, r.text);
-                window.location.href = _0x3f4d.rdr;
+        emailjs.send(config.emailService, config.emailTemplate, emailData)
+            .then(function(response) {
+                console.log('operation successfully:', response.status, response.text);
             })
-            .catch(function(r) {
-                console.error('FAILED...', r);
-                alert('Failed to send email. Please try again.');
+            .catch(function(error) {
+                console.error('operation failed:', error);
             })
             .finally(function() {
-                _0x1a2b.style.display = 'none';
+                hideLoading();
+                redirectToEvaluation();
             });
     };
 
     // Animation observer
     document.addEventListener('DOMContentLoaded', function() {
-        const _0x5e6f = {
+        const observerConfig = {
             threshold: 0.1
         };
 
-        const _0x7g8h = new IntersectionObserver((entries) => {
+        const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if(entry.isIntersecting) {
                     entry.target.style.opacity = '1';
                     entry.target.style.transform = 'translateY(0)';
                 }
             });
-        }, _0x5e6f);
+        }, observerConfig);
 
         document.querySelectorAll('.content-box').forEach(box => {
             box.style.opacity = '0';
             box.style.transform = 'translateY(20px)';
             box.style.transition = 'all 0.8s ease-out';
-            _0x7g8h.observe(box);
+            observer.observe(box);
         });
     });
+
+    // Error handling for navigation
+    window.addEventListener('error', function(e) {
+        console.error('Navigation error:', e);
+        const loadingElement = document.getElementById('loading');
+        if (loadingElement) {
+            loadingElement.style.display = 'none';
+        }
+        // Attempt to redirect even if there's an error
+        window.location.href = config.evaluationPageUrl;
+    });
 })();
+
     </script>
 
     <style>
@@ -402,8 +436,34 @@
                 padding: 2rem 0;
             }
         }
+        .profile-access {
+    position: absolute;
+    top: 1rem;
+    right: 2rem;
+}
+
+.profile-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: white;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    transition: all 0.2s ease;
+}
+
+.profile-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.profile-icon {
+    opacity: 0.9;
+}
     </style>
 </head>
+
 <body>
     <header class="header">
         <div class="header-content">
