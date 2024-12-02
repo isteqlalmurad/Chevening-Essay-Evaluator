@@ -1,254 +1,426 @@
+// app.js - Complete Essay Evaluator Script
 document.addEventListener('DOMContentLoaded', function() {
-    const _0x5e8a = {
-        _k1: "sk-proj-IjbnbvKdX6QNWEeONkMomf5Bbk2JIdI5gnflfZD8iBQ13sd5_Gd",
-        _k2: "fUOWYk_T3BlbkFJbR2HjOD6gNlqutM0Mlba0szn9u9cLL1Nuqm9axLl-O6veJ06WvV5pP5MUA",
-        get _key() {
-            return this._k1 + this._k2;
-        }
+  
+    // State
+    let selectedEssayType = '';
+    let originalClickHandlers = new Map();
+
+    // DOM elements
+    const chatArea = document.getElementById('chatArea');
+    const userInput = document.getElementById('userInput');
+    const submitButton = document.getElementById('submitBtn');
+
+ 
+
+    // Initialize subscription modal
+    const initializeModal = () => {
+        const stripeScript = document.createElement('script');
+        stripeScript.src = 'https://js.stripe.com/v3/buy-button.js';
+        stripeScript.async = true;
+        document.head.appendChild(stripeScript);
+
+        const modal = document.createElement('div');
+        modal.className = 'subscription-modal';
+        modal.innerHTML = `
+            <div class="subscription-modal-content">
+                <h2 style="margin-bottom: 1rem;">Premium Feature</h2>
+                <p id="modal-message"></p>
+                <div class="modal-buttons">
+                    <button id="modal-action-btn" class="submit-btn" style="padding: 0.5rem 1rem;"></button>
+                    <button id="modal-close-btn" class="submit-btn" style="padding: 0.5rem 1rem; background: #666;">Close</button>
+                </div>
+                <div id="stripe-button-container" style="margin-top: 1rem;"></div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        // Set up modal close handlers
+        document.getElementById('modal-close-btn').onclick = () => {
+            modal.style.display = 'none';
+        };
+
+        modal.onclick = (e) => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        };
+
+        return modal;
     };
 
-    let _et = '';
-    const _ca = document.getElementById('chatArea');
-    const _ui = document.getElementById('userInput');
-    const _sb = document.getElementById('submitBtn');
+    const modal = initializeModal();
 
-    const _criteria = {
-        'leadership': `
-            - Quality of leadership examples
-            - Impact measurement
-            - Personal growth demonstration
-            - Future application of leadership skills`,
-        'networking': `
-            - Network building capabilities
-            - Cultural awareness
-            - Future networking plans
-            - Relationship sustainability`,
-        'career': `
-            - Career trajectory clarity
-            - Goal setting and specificity
-            - UK degree relevance
-            - Home country impact`,
-        'study': `
-            - Course selection justification
-            - University fit
-            - Academic background relevance
-            - UK-specific benefits`
-    };
-
-    document.querySelectorAll('.essay-type').forEach(_t => {
-        _t.addEventListener('click', function() {
-            _et = this.dataset.type;
-            document.querySelectorAll('.essay-type').forEach(_x => 
-                _x.style.border = 'none'
-            );
-            this.style.border = '2px solid var(--accent-blue)';
-            _addMsg(`I'll help you evaluate your ${_et} essay. Please paste your essay in the text area below.`, 'bot');
-        });
-    });
-
-    const _createAnim = () => {
-        const _ld = document.createElement('div');
-        _ld.className = 'loading-animation';
-        const _dt = document.createElement('div');
-        _dt.className = 'dots';
+    // Utility Functions
+    const createLoadingAnimation = () => {
+        const loadingDiv = document.createElement('div');
+        loadingDiv.className = 'loading-animation';
+        const dotsDiv = document.createElement('div');
+        dotsDiv.className = 'dots';
         for(let i = 0; i < 3; i++) {
-            const _d = document.createElement('div');
-            _d.className = 'dot';
-            _dt.appendChild(_d);
+            const dot = document.createElement('div');
+            dot.className = 'dot';
+            dotsDiv.appendChild(dot);
         }
-        _ld.appendChild(_dt);
-        return _ld;
+        loadingDiv.appendChild(dotsDiv);
+        return loadingDiv;
     };
 
-    const _valEt = async (_e, _t) => {
-        const _p = `Analyze this essay and determine if it is a ${_t} essay for Chevening Scholarship. 
-Reply with only "true" if it matches the type, or "false" if it doesn't match. Essay:
-${_e}`;
-
-        const _r = await fetch('https://api.openai.com/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${_0x5e8a._key}`
-            },
-            body: JSON.stringify({
-                model: "gpt-4",
-                messages: [{
-                    role: "user",
-                    content: _p
-                }],
-                temperature: 0.1
-            })
-        });
-
-        if(!_r.ok) throw new Error('Validation failed');
-        const _d = await _r.json();
-        return _d.choices[0].message.content.toLowerCase().includes('true');
-    };
-
-    const _addMsg = (_t, _s) => {
-        const _md = document.createElement('div');
-        _md.classList.add('message', `${_s}-message`);
-        if(_s === 'bot' && _t.includes('Strong Points')) {
-            _md.innerHTML = _parseFb(_t);
+    const addMessage = (text, sender) => {
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('message', `${sender}-message`);
+        if(sender === 'bot' && text.includes('Strong Points')) {
+            messageDiv.innerHTML = parseFeedback(text);
         } else {
-            _md.textContent = _t;
+            messageDiv.textContent = text;
         }
-        _ca.appendChild(_md);
-        _ca.scrollTop = _ca.scrollHeight;
+        chatArea.appendChild(messageDiv);
+        chatArea.scrollTop = chatArea.scrollHeight;
     };
 
-    const _parseFb = (_t) => {
-        _t = _t.replace(/\*\*\*\*/g, '**')
+    const parseFeedback = (text) => {
+        text = text.replace(/\*\*\*\*/g, '**')
              .replace(/\*\*\s+/g, '**')
              .replace(/\s+\*\*/g, '**');
         
-        const _secs = _t.split(/\d\.\s*\*\*/).filter(Boolean);
-        let _html = '';
+        const sections = text.split(/\d\.\s*\*\*/).filter(Boolean);
+        let html = '';
         
-        const _sm = _t.match(/Overall score.*?(\d+\.?\d*)/i);
-        const _sc = _sm ? parseFloat(_sm[1]) : null;
+        const scoreMatch = text.match(/Overall score.*?(\d+\.?\d*)/i);
+        const score = scoreMatch ? parseFloat(scoreMatch[1]) : null;
 
-        const _si = {
+        const sectionIcons = {
             'Strong Points': '💪',
             'Weak Points': '⚠️',
             'Feedback for Improvement': '📝'
         };
 
-        _secs.forEach(_s => {
-            const _tm = _s.match(/([^:]*?):/);
-            if(_tm) {
-                const _ti = _tm[1].replace(/\*\*/g, '').trim();
-                const _ic = _si[_ti] || '';
-                const _ct = _s.replace(_tm[0], '').trim();
-                const _pts = _ct.split('\n').filter(_p => _p.trim());
+        sections.forEach(section => {
+            const titleMatch = section.match(/([^:]*?):/);
+            if(titleMatch) {
+                const title = titleMatch[1].replace(/\*\*/g, '').trim();
+                const icon = sectionIcons[title] || '';
+                const content = section.replace(titleMatch[0], '').trim();
+                const points = content.split('\n').filter(point => point.trim());
 
-                _html += `
+                html += `
                     <div class="feedback-section">
-                        <div class="feedback-header">${_ic} ${_ti}</div>
+                        <div class="feedback-header">${icon} ${title}</div>
                         <ul class="feedback-list">
-                            ${_pts.map(_p => `<li>${_p.replace(/^-\s*/, '')}</li>`).join('')}
+                            ${points.map(point => `<li>${point.replace(/^-\s*/, '')}</li>`).join('')}
                         </ul>
                     </div>`;
             }
         });
 
-        if(_sc !== null) {
-            const _ds = Number.isInteger(_sc) ? _sc : _sc.toFixed(1);
-            _html += `
+        if(score !== null) {
+            const displayScore = Number.isInteger(score) ? score : score.toFixed(1);
+            html += `
                 <div class="feedback-score">
-                    Overall Score: ${_ds}/10
+                    Overall Score: ${displayScore}/10
                 </div>`;
         }
 
-        return _html;
+        return html;
     };
 
-    const _getAIF = async (_e, _t) => {
-        const _p = `Please evaluate this ${_t} essay for a Chevening Scholarship application. Consider the following criteria:
-${_criteria[_t]}
-
-Essay to evaluate:
-${_e}
-
-Please provide detailed feedback in the following format:
-1. **Strong Points**: List 3 strong points of the essay.
-2. **Weak Points**: List at least 2 weak points of the essay.
-3. **Feedback for Improvement**: Provide suggestions on how to improve the weak points.
-
-Overall score out of 10.`;
-
-        const _r = await fetch('https://api.openai.com/v1/chat/completions', {
+    // API Functions
+    const validateEssayType = async (essay, type) => {
+        const response = await fetch('https://kingmurad001.pythonanywhere.com/validate_essay', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${_0x5e8a._key}`
+                'Authorization': `Bearer ${localStorage.getItem('authToken')}`
             },
             body: JSON.stringify({
-                model: "gpt-4",
-                messages: [{
-                    role: "user",
-                    content: _p
-                }],
-                temperature: 0.1
+                essay: essay,
+                type: type
             })
         });
+    
+        if (!response.ok) throw new Error('Validation failed');
+        const data = await response.json();
+        return data.isValid;
+    };
+    
+    const getAIFeedback = async (essay, type) => {
+        const response = await fetch('https://kingmurad001.pythonanywhere.com/get_essay_feedback', {
+            method: 'POST',
+     
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+            },
+            body: JSON.stringify({
+                essay: essay,
+                type: type
+            })
+        });
+    
+        if (!response.ok) throw new Error('Failed to get AI feedback');
+        const data = await response.json();
+        return data.feedback;
+    };
+    // Subscription Functions
+    async function checkSubscription() {
+        const userEmail = localStorage.getItem('userEmail');
+        const authToken = localStorage.getItem('authToken');
 
-        if(!_r.ok) throw new Error('Failed to get AI feedback');
-        const _d = await _r.json();
-        return _d.choices[0].message.content;
+        if (!userEmail || !authToken) {
+            return false;
+        }
+
+        try {
+            const response = await fetch('https://kingmurad001.pythonanywhere.com/get_user_data', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`
+                },
+                body: JSON.stringify({ email: userEmail })
+            });
+
+            const data = await response.json();
+            return data.user?.has_active_subscription || false;
+
+        } catch (error) {
+            console.error('Error checking subscription:', error);
+            return false;
+        }
+    }
+
+// In the showModal function, modify the redirect URLs:
+function showModal(isLoggedIn) {
+    const modalMessage = document.getElementById('modal-message');
+    const actionBtn = document.getElementById('modal-action-btn');
+    const stripeContainer = document.getElementById('stripe-button-container');
+    
+    // Get current page URL for redirect
+    const returnUrl = encodeURIComponent(window.location.href);
+
+    if (!isLoggedIn) {
+        modalMessage.textContent = "Register to get access to extra features and more intelligent AI model, for greater accuracy in essay evaluation";
+        actionBtn.textContent = "Register/Login";
+        actionBtn.onclick = () => window.location.href = `/Users/murad/Side_Projects/Chevening Evaluation Tool/login-essays.html?return=${returnUrl}`;
+        stripeContainer.style.display = 'none';
+    } else {
+        modalMessage.textContent = "Subscribe to unlock premium features";
+        actionBtn.style.display = 'none';
+        stripeContainer.innerHTML = '';
+        const stripeButton = document.createElement('stripe-buy-button');
+        stripeButton.setAttribute('buy-button-id', 'buy_btn_1QQURlE4KMDw3iLIRXlBbywY');
+        stripeButton.setAttribute('publishable-key', 'pk_live_51QQTtrE4KMDw3iLI4lW8AzaFw6B09feV75SFiS5Pu9B9SkjdUIWiL5Pg7V5fRdC5d9hsdxYQgikfkxlv1P9r4G3e00AFNzhuyy');
+        stripeButton.setAttribute('customer-email', localStorage.getItem('userEmail'));
+        // Add success URL for Stripe
+        stripeButton.setAttribute('success-url', returnUrl);
+        stripeContainer.appendChild(stripeButton);
+    }
+
+    modal.style.display = 'flex';
+}
+
+ // Modified updateEssayAccess function
+async function updateEssayAccess() {
+    const hasSubscription = await checkSubscription();
+    const isLoggedIn = !!localStorage.getItem('authToken');
+    
+    const leadershipEssay = document.querySelector('[data-type="leadership"]');
+    const networkingEssay = document.querySelector('[data-type="networking"]');
+
+    if (!hasSubscription) {
+        leadershipEssay.classList.add('locked');
+        networkingEssay.classList.add('locked');
+
+        [leadershipEssay, networkingEssay].forEach(essay => {
+            // Remove the original click handler completely
+            const originalHandler = originalClickHandlers.get(essay);
+            essay.removeEventListener('click', originalHandler);
+            
+            // Replace with lock handler
+            essay.onclick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                showModal(isLoggedIn);
+            };
+        });
+    } else {
+        leadershipEssay.classList.remove('locked');
+        networkingEssay.classList.remove('locked');
+
+        [leadershipEssay, networkingEssay].forEach(essay => {
+            // Remove any existing onclick handler
+            essay.onclick = null;
+            
+            // Re-add the original handler
+            const originalHandler = originalClickHandlers.get(essay);
+            essay.addEventListener('click', originalHandler);
+        });
+    }
+}
+
+    // Event Handlers
+// Event Handlers for essay selection
+document.querySelectorAll('.essay-type').forEach(button => {
+    const originalHandler = function(e) {
+        // If essay is locked, don't proceed with the original handler
+        if (button.classList.contains('locked')) {
+            e.preventDefault();
+            return;
+        }
+        selectedEssayType = button.dataset.type;
+        document.querySelectorAll('.essay-type').forEach(btn => 
+            btn.style.border = 'none'
+        );
+        button.style.border = '2px solid var(--accent-blue)';
+        addMessage(`I'll help you evaluate your ${selectedEssayType} essay. Please paste your essay in the text area below.`, 'bot');
     };
 
-    _sb.addEventListener('click', async function() {
-        if(!_et) {
-            _addMsg('Please select an essay type first.', 'bot');
+    // Store the original handler for later use
+    originalClickHandlers.set(button, originalHandler);
+    button.addEventListener('click', originalHandler);
+});
+
+    submitButton.addEventListener('click', async function() {
+        const selectedEssay = document.querySelector(`[data-type="${selectedEssayType}"]`);
+        
+        if (selectedEssay?.classList.contains('locked')) {
+            const isLoggedIn = !!localStorage.getItem('authToken');
+            showModal(isLoggedIn);
             return;
         }
 
-        const _txt = _ui.value.trim();
-        if(!_txt) {
-            _addMsg('Please enter your essay text.', 'bot');
+        if(!selectedEssayType) {
+            addMessage('Please select an essay type first.', 'bot');
             return;
         }
 
-        _sb.disabled = true;
+        const essayText = userInput.value.trim();
+        if(!essayText) {
+            addMessage('Please enter your essay text.', 'bot');
+            return;
+        }
+
+        submitButton.disabled = true;
         
         try {
-            const _la = _createAnim();
-            _ca.appendChild(_la);
+            const loadingAnim = createLoadingAnimation();
+            chatArea.appendChild(loadingAnim);
 
-            const _isValid = await _valEt(_txt, _et);
+            const isValid = await validateEssayType(essayText, selectedEssayType);
             
-            _ca.removeChild(_la);
+            chatArea.removeChild(loadingAnim);
 
-            if(!_isValid) {
-                _addMsg(`This appears to be a different type of essay than "${_et}". Please check your selection or essay content.`, 'bot');
-                _sb.disabled = false;
-                _ui.value = '';
+            if(!isValid) {
+                addMessage(`This appears to be a different type of essay than "${selectedEssayType}". Please check your selection or essay content.`, 'bot');
+                submitButton.disabled = false;
+                userInput.value = '';
                 return;
             }
 
-            _addMsg(_txt, 'user');
-            _ui.value = '';
+            addMessage(essayText, 'user');
+            userInput.value = '';
             
-            const _fla = _createAnim();
-            _ca.appendChild(_fla);
+            const feedbackLoadingAnim = createLoadingAnimation();
+            chatArea.appendChild(feedbackLoadingAnim);
 
-            const _fb = await _getAIF(_txt, _et);
+            const feedback = await getAIFeedback(essayText, selectedEssayType);
             
-            _ca.removeChild(_fla);
-            _addMsg(_fb, 'bot');
+            chatArea.removeChild(feedbackLoadingAnim);
+            addMessage(feedback, 'bot');
 
-            const _sm = _fb.match(/Overall score.*?(\d+\.?\d*)/i);
-            const _sc = _sm ? parseFloat(_sm[1]) : 0;
+            const scoreMatch = feedback.match(/Overall score.*?(\d+\.?\d*)/i);
+            const score = scoreMatch ? parseFloat(scoreMatch[1]) : 0;
 
-            const _cg = document.getElementById('dataConsent').checked;
-            if(_cg && _sc >= 6) {
+            const consentGiven = document.getElementById('dataConsent').checked;
+            if(consentGiven && score >= 6) {
                 try {
-                    const _fs = Number.isInteger(_sc) ? _sc : _sc.toFixed(1);
+                    const formattedScore = Number.isInteger(score) ? score : score.toFixed(1);
                     await emailjs.send(
                         'service_4caaf5f',
                         'template_5dhjfx4',
                         {
                             to_email: 'murad@leximos.com',
-                            subject: `New ${_et} Essay Submission (Score: ${_fs}/10)`,
-                            message: `A new ${_et} essay has been submitted for evaluation.
-                            \nScore: ${_fs}/10
-                            \nEssay Content:\n${_txt}`
+                            subject: `New ${selectedEssayType} Essay Submission (Score: ${formattedScore}/10)`,
+                            message: `A new ${selectedEssayType} essay has been submitted for evaluation.
+                            \nScore: ${formattedScore}/10
+                            \nEssay Content:\n${essayText}`
                         }
                     );
-                    console.log('Notification email sent successfully');
-                } catch(_e) {
-                    console.error('Failed to send notification email:', _e);
+                    console.log('Notification successfully');
+                } catch(error) {
+                    console.error('Failed to send notification:', error);
                 }
             }
-        } catch(_e) {
-            _addMsg('Sorry, there was an error evaluating your essay. Please try again.', 'bot');
-            console.error('Error:', _e);
+        } catch(error) {
+            addMessage('Sorry, there was an error evaluating your essay. Please try again.', 'bot');
+            console.error('Error:', error);
         } finally {
-            _sb.disabled = false;
-            _ui.value = '';
-            _ui.focus();
+            submitButton.disabled = false;
+            userInput.value = '';
+            userInput.focus();
         }
+    });
+
+    // Initialize subscription check and periodic updates
+    updateEssayAccess();
+    setInterval(updateEssayAccess, 30000);
+
+    // Listen for Stripe checkout completion
+    window.addEventListener('message', async (event) => {
+        if (event.data === 'checkout.completed') {
+            await updateEssayAccess();
+        }
+    });
+
+    // Optional: Add auto-save functionality for essay drafts
+    let autoSaveInterval;
+    userInput.addEventListener('input', () => {
+        clearTimeout(autoSaveInterval);
+        autoSaveInterval = setTimeout(() => {
+            if (userInput.value.trim()) {
+                localStorage.setItem('essayDraft', userInput.value);
+                localStorage.setItem('essayType', selectedEssayType);
+            }
+        }, 2000);
+    });
+
+    // Restore draft if exists
+    const savedDraft = localStorage.getItem('essayDraft');
+    const savedType = localStorage.getItem('essayType');
+    if (savedDraft && savedType) {
+        const essayButton = document.querySelector(`[data-type="${savedType}"]`);
+        if (essayButton && !essayButton.classList.contains('locked')) {
+            userInput.value = savedDraft;
+            essayButton.click();
+        }
+    }
+
+    // Add profile access if not already present
+    if (!document.querySelector('.profile-access')) {
+        const profileLink = document.createElement('a');
+        profileLink.href = 'profile-page.html';
+        profileLink.className = 'profile-button';
+        profileLink.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            My Profile
+        `;
+        document.querySelector('.header').appendChild(profileLink);
+    }
+
+    // Error handling for network issues
+    window.addEventListener('online', async () => {
+        addMessage('Connection restored. You can continue working.', 'bot');
+        await updateEssayAccess();
+    });
+
+    window.addEventListener('offline', () => {
+        addMessage('You are currently offline. Some features may not be available.', 'bot');
+    });
+
+    // Clean up function for page unload
+    window.addEventListener('beforeunload', () => {
+        clearInterval(autoSaveInterval);
     });
 });
